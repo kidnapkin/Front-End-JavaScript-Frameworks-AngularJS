@@ -62,7 +62,7 @@ angular.module('confusionApp')
 
     console.log($scope.feedback);
 
-    if ($scope.feedback.agree && ($scope.feedback.mychannel == "")) {
+    if ($scope.feedback.agree && ($scope.feedback.mychannel === "")) {
       $scope.invalidChannelSelection = true;
       console.log('incorrect');
     } else {
@@ -81,10 +81,10 @@ angular.module('confusionApp')
   };
 }])
 
-.controller('DishDetailController', ['$scope', 'menuFactory', function($scope, menuFactory) {
+.controller('DishDetailController', ['$scope', '$routeParams', 'menuFactory', function($scope, $routeParams, menuFactory) {
 
-  $scope.dish = menuFactory.getDish(3);
-
+  var dish = menuFactory.getDish(parseInt($routeParams.id, 10));
+  $scope.dish = dish;
 }])
 
 .controller('DishCommentController', ['$scope', function($scope) {
@@ -117,5 +117,5 @@ angular.module('confusionApp')
       comment: "",
       author: ""
     };
-  }
+  };
 }]);
