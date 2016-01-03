@@ -66,7 +66,7 @@ angular.module('confusionApp')
 
 }])
 
-.controller('FeedbackController', ['$scope', function($scope) {
+.controller('FeedbackController', ['$scope', 'feedbackFactory', function($scope, feedbackFactory) {
 
   $scope.sendFeedback = function() {
 
@@ -77,6 +77,7 @@ angular.module('confusionApp')
       console.log('incorrect');
     } else {
       $scope.invalidChannelSelection = false;
+      feedbackFactory.getFeedbacks().save($scope.feedback);
       $scope.feedback = {
         mychannel: "",
         firstName: "",
@@ -142,6 +143,7 @@ angular.module('confusionApp')
 
   $scope.showDish = false;
   $scope.message = "Loading ...";
+
   $scope.dish = menuFactory.getDishes().get({
       id: 0
     })
@@ -155,14 +157,52 @@ angular.module('confusionApp')
       }
     );
 
-  $scope.promotion = menuFactory.getPromotion(0);
+  $scope.showPromotion = false;
+  $scope.promoMessage = "Loading ...";
 
-  $scope.chef = corporateFactory.getLeader(3);
+  $scope.promotion = menuFactory.getPromotion().get({
+      id: 0
+    })
+    .$promise.then(
+      function(response) {
+        $scope.promotion = response;
+        $scope.showPromotion = true;
+      },
+      function(response) {
+        $scope.promoMessage = "Error: " + response.status + " " + response.statusText;
+      }
+    );
+
+  $scope.showChef = false;
+  $scope.chefMessage = "Loading ...";
+
+  $scope.chef = corporateFactory.getLeaders().get({
+      id: 3
+    })
+    .$promise.then(
+      function(response) {
+        $scope.chef = response;
+        $scope.showChef = true;
+      },
+      function(response) {
+        $scope.chefMessage = "Error: " + response.status + " " + response.statusText;
+      }
+    );
 
 }])
 
 .controller('AboutController', ['$scope', 'corporateFactory', function($scope, corporateFactory) {
 
-  $scope.leaders = corporateFactory.getLeaders();
+  $scope.showLeader = false;
+  $scope.message = "Loading ...";
 
+  corporateFactory.getLeaders().query(
+    function(response) {
+      $scope.leaders = response;
+      $scope.showLeaders = true;
+    },
+    function(response) {
+      $scope.message = "Error: " + response.status + " " + response.statusText;
+    }
+  );
 }]);

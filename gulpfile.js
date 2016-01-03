@@ -12,9 +12,10 @@ var gulp = require('gulp'),
   changed = require('gulp-changed'),
   rev = require('gulp-rev'),
   browserSync = require('browser-sync'),
-  del = require('del');
+  del = require('del'),
   ngannotate = require('gulp-ng-annotate');
 
+// JSHint
 gulp.task('jshint', function() {
   return gulp.src('app/scripts/**/*.js')
     .pipe(jshint())
@@ -28,12 +29,13 @@ gulp.task('clean', function() {
 
 // Default task
 gulp.task('default', ['clean'], function() {
-  gulp.start('usemin', 'imagemin', 'copyfonts');
+  return gulp.start('usemin', 'imagemin', 'copyfonts');
 });
 
 
+// Concat, minify, uglify, etc
 gulp.task('usemin', ['jshint'], function() {
-  return gulp.src('./app/*.html')
+  return gulp.src('./app/**/*.html')
     .pipe(usemin({
       css: [minifycss(), rev()],
       js: [ngannotate(), uglify(), rev()]
@@ -55,6 +57,7 @@ gulp.task('imagemin', function() {
     }));
 });
 
+// Fonts
 gulp.task('copyfonts', ['clean'], function() {
   gulp.src('./bower_components/font-awesome/fonts/**/*.{ttf,woff,eof,svg}*')
     .pipe(gulp.dest('./dist/fonts'));
@@ -62,15 +65,7 @@ gulp.task('copyfonts', ['clean'], function() {
     .pipe(gulp.dest('./dist/fonts'));
 });
 
-// Watch
-gulp.task('watch', ['browser-sync'], function() {
-  // Watch .js files
-  gulp.watch('{app/scripts/**/*.js,app/styles/**/*.css,app/**/*.html}', ['usemin']);
-  // Watch image files
-  gulp.watch('app/images/**/*', ['imagemin']);
-
-});
-
+// BrowserSync setup
 gulp.task('browser-sync', ['default'], function() {
   var files = [
     'app/**/*.html',
@@ -86,6 +81,15 @@ gulp.task('browser-sync', ['default'], function() {
       index: "index.html"
     }
   });
+
   // Watch any files in dist/, reload on change
   gulp.watch(['dist/**']).on('change', browserSync.reload);
+});
+
+// Watch task
+gulp.task('watch', ['browser-sync'], function() {
+  // Watch .js files
+  gulp.watch('{app/scripts/**/*.js,app/styles/**/*.css,app/**/*.html}', ['usemin']);
+  // Watch image files
+  gulp.watch('app/images/**/*', ['imagemin']);
 });
